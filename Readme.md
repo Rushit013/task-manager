@@ -160,6 +160,16 @@ backend/
 
 ---
 
+## ** Mobile App Screenshots**  
+
+| Login                                                                                                                                                  | Signup                                                                                                                                                 | Change Password                                                                                                                                        |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![Simulator Screen Shot - iPhone 13 Pro Max - 2025-02-27 at 11 04 58](https://github.com/user-attachments/assets/ec417da0-9767-4011-b192-c5e9f77e76ec) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2025-02-27 at 11 05 00](https://github.com/user-attachments/assets/8bdcf5a4-d40b-4583-bf57-16baf65efa92) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2025-02-27 at 11 04 54](https://github.com/user-attachments/assets/7824f487-a2dd-4e5d-9c6e-4bf154dc6779) |
+| Home                                                                                                                                                   | Create Task                                                                                                                                            | Profile                                                                                                                                                |
+| ![Simulator Screen Shot - iPhone 13 Pro Max - 2025-02-27 at 11 04 42](https://github.com/user-attachments/assets/6dd1c102-4584-41d0-8960-bd42c1f61c7b) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2025-02-27 at 11 04 46](https://github.com/user-attachments/assets/ff3aaa59-f2b1-42a5-8ac6-60fa8900d699) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2025-02-27 at 11 04 48](https://github.com/user-attachments/assets/ead3759a-16a1-43c1-92c0-cc3c053426a0) |
+
+---
+
 ## **Environment Variables**
 
 ### **Backend (`.env`)**
