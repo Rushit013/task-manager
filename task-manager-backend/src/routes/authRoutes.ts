@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
 import authMiddleware, { AuthRequest } from "../middleware/authMiddleware";
+import { omit } from "lodash";
 
 const router = Router();
 
@@ -18,24 +19,29 @@ router.post("/signup", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+router.post("/login", async (req: Request, res: Response): Promise<void> => {
   try {
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "User not found" });
+    if (!user) {
+      res.status(400).json({ error: "User not found" });
+      return;
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
+    if (!isMatch) {
+      res.status(400).json({ error: "Invalid credentials" });
+      return;
+    }
 
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET || "secret"
-      // { expiresIn: "1h" }
     );
 
     const userData = user.toObject();
-    delete userData.password;
-    res.json({ token, user: userData });
+
+    res.json({ token, user: omit(userData, ["password"]) });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -45,42 +51,35 @@ router.post("/login", async (req: Request, res: Response) => {
 router.put(
   "/change-password",
   authMiddleware,
-  async (req: AuthRequest, res: Response) => {
+  async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { oldPassword, newPassword } = req.body;
 
     if (!oldPassword || !newPassword) {
-      return res
-        .status(400)
-        .json({ error: "Old and new passwords are required." });
+      res.status(400).json({ error: "Old and new passwords are required." });
+      return;
     }
 
     try {
-      const user = (await User.findById(userId)) as IUser;
+      const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ error: "User not found." });
+        res.status(404).json({ error: "User not found." });
+        return;
       }
 
-      // Compare the provided old password with the stored password
       const isMatch = await bcrypt.compare(oldPassword, user.password);
       if (!isMatch) {
-        return res.status(400).json({ error: "Old password is incorrect." });
+        res.status(400).json({ error: "Old password is incorrect." });
+        return;
       }
 
-      // Hash the new password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-      // Update user password and save
-      user.password = hashedPassword;
+      user.password = await bcrypt.hash(newPassword, 10);
       await user.save();
 
-      return res
-        .status(200)
-        .json({ message: "Password changed successfully." });
+      res.status(200).json({ message: "Password changed successfully." });
     } catch (err) {
       console.error(err);
-      return res.status(500).json({ error: "Server error." });
+      res.status(500).json({ error: "Server error." });
     }
   }
 );

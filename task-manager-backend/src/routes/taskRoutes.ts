@@ -4,76 +4,120 @@ import authMiddleware, { AuthRequest } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Create a new task with an optional "completed" field (default is false)
-router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
-  const { title, description, completed } = req.body;
-  const userId = req.user?.id;
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+// Create a new task
+router.post(
+  "/",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    const { title, description, completed } = req.body;
+    const userId = req.user?.id;
 
-  try {
-    const newTask: ITask = new Task({
-      title,
-      description,
-      user: userId,
-      completed: completed ?? false, // default to false if not provided
-    });
-    await newTask.save();
-    res.status(201).json(newTask);
-  } catch (err) {
-    res.status(400).json({ error: "Unable to create task" });
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    try {
+      const newTask: ITask = new Task({
+        title,
+        description,
+        user: userId,
+        completed: completed ?? false,
+      });
+
+      await newTask.save();
+      res.status(201).json(newTask);
+    } catch (err) {
+      res.status(400).json({ error: "Unable to create task" });
+    }
   }
-});
+);
 
 // Get all tasks for the logged-in user
-router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.get(
+  "/",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    const userId = req.user?.id;
 
-  try {
-    // Fetch tasks & include createdAt
-    const tasks = await Task.find({ user: userId }).select(
-      "title description completed createdAt"
-    );
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
-    res.json(tasks);
-  } catch (err) {
-    res.status(500).json({ error: "Unable to fetch tasks" });
+    try {
+      const tasks = await Task.find({ user: userId }).select(
+        "title description completed createdAt"
+      );
+      res.json(tasks);
+    } catch (err) {
+      res.status(500).json({ error: "Unable to fetch tasks" });
+    }
   }
-});
+);
 
 // Get a specific task by its ID
-router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
-  try {
-    const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).json({ error: "Task not found" });
-    res.json(task);
-  } catch (err) {
-    res.status(500).json({ error: "Unable to fetch task" });
-  }
-});
+router.get(
+  "/:id",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const task = await Task.findById(req.params.id);
 
-// Update a task (e.g., title, description, completed)
-router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
-  try {
-    // req.body can include title, description, and completed
-    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!updatedTask) return res.status(404).json({ error: "Task not found" });
-    res.json(updatedTask);
-  } catch (err) {
-    res.status(400).json({ error: "Unable to update task" });
+      if (!task) {
+        res.status(404).json({ error: "Task not found" });
+        return;
+      }
+
+      res.json(task);
+    } catch (err) {
+      res.status(500).json({ error: "Unable to fetch task" });
+    }
   }
-});
+);
+
+// Update a task
+router.put(
+  "/:id",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const updatedTask = await Task.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+      );
+
+      if (!updatedTask) {
+        res.status(404).json({ error: "Task not found" });
+        return;
+      }
+
+      res.json(updatedTask);
+    } catch (err) {
+      res.status(400).json({ error: "Unable to update task" });
+    }
+  }
+);
 
 // Delete a task
-router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
-  try {
-    await Task.findByIdAndDelete(req.params.id);
-    res.json({ message: "Task deleted" });
-  } catch (err) {
-    res.status(400).json({ error: "Unable to delete task" });
+router.delete(
+  "/:id",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const task = await Task.findByIdAndDelete(req.params.id);
+
+      if (!task) {
+        res.status(404).json({ error: "Task not found" });
+        return;
+      }
+
+      res.json({ message: "Task deleted" });
+    } catch (err) {
+      res.status(400).json({ error: "Unable to delete task" });
+    }
   }
-});
+);
 
 export default router;

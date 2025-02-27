@@ -14,7 +14,7 @@ axiosInstance.interceptors.request.use(
     const state = store.getState(); // Get the latest state from Redux
     const token = state?.auth?.userToken; // Retrieve token from Redux
     if (token && config.headers) {
-      config.headers.Authorization = token;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -25,7 +25,17 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error);
+    if (error.response) {
+      // ✅ Extract and log the actual error message from the server
+      console.error("API Error:", error.response.data);
+    } else if (error.request) {
+      // ✅ Handle network errors (no response from server)
+      console.error("Network Error: No response received from server.");
+    } else {
+      // ✅ Handle unexpected errors
+      console.error("Unexpected Error:", error.message);
+    }
+
     return Promise.reject(error);
   }
 );

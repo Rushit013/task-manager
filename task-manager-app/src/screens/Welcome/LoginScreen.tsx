@@ -7,6 +7,8 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useToast } from "../../context/ToastContext";
+import { get } from "lodash";
 
 interface LoginFormData {
   email: string;
@@ -25,6 +27,7 @@ export default function LoginScreen({ navigation }: any) {
   const theme = useTheme();
   const { login } = useContext(AuthContext);
   const { showLoader, hideLoader } = useLoader();
+  const { showToast } = useToast();
 
   const {
     control,
@@ -39,6 +42,12 @@ export default function LoginScreen({ navigation }: any) {
       showLoader();
       await login(data?.email, data?.password);
     } catch (error) {
+      const errorText = get(
+        error,
+        "response.data.error",
+        get(error, "message", "")
+      );
+      showToast(`Login error: ${errorText}`);
       console.error("Login error:", error);
     } finally {
       hideLoader();

@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import SaferAreaContainer from "../../components/SaferAreaContainer";
+import { get } from "lodash";
 
 interface CreateTaskFormData {
   title: string;
@@ -44,6 +45,12 @@ const CreateTaskScreen = () => {
         reset();
       })
       .catch((error) => {
+        const errorText = get(
+          error,
+          "response.data.error",
+          get(error, "message", "")
+        );
+        showToast(`Error deleting task: ${errorText}`);
         console.error("Error deleting task:", error);
       })
       .finally(() => {

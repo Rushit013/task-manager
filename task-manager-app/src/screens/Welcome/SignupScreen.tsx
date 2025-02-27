@@ -7,6 +7,8 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { get } from "lodash";
+import { useToast } from "../../context/ToastContext";
 
 interface SignupFormData {
   name: string;
@@ -32,6 +34,7 @@ export default function SignupScreen({ navigation }: any) {
   const theme = useTheme();
   const { signup } = useContext(AuthContext);
   const { showLoader, hideLoader } = useLoader();
+  const { showToast } = useToast();
 
   const {
     control,
@@ -47,6 +50,12 @@ export default function SignupScreen({ navigation }: any) {
       await signup(data?.name, data?.email, data?.password);
     } catch (error) {
       console.error("Signup error:", error);
+      const errorText = get(
+        error,
+        "response.data.error",
+        get(error, "message", "")
+      );
+      showToast(`Signup error: ${errorText}`);
     } finally {
       hideLoader();
     }

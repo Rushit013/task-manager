@@ -29,37 +29,33 @@ interface Props {
 export const AuthProvider = ({ children }: Props) => {
   const dispatch = useDispatch();
 
-  const login = async (email: string, password: string) => {
-    loginAPI({
-      email,
-      password,
-    })
-      .then(async (res) => {
-        const token = get(res, "token");
-        const user = get(res, "user");
-        if (token && user) {
-          dispatch(loginSuccess({ token, user }));
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        throw error;
-      });
+  const login = async (email: string, password: string): Promise<void> => {
+    try {
+      const res = await loginAPI({ email, password });
+      const token = get(res, "token");
+      const user = get(res, "user");
+
+      if (token && user) {
+        dispatch(loginSuccess({ token, user }));
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   };
 
-  const signup = async (name: string, email: string, password: string) => {
-    signupAPI({
-      name,
-      email,
-      password,
-    })
-      .then(async (res) => {
-        await login(email, password);
-      })
-      .catch((error) => {
-        console.error(error);
-        throw error;
-      });
+  const signup = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<void> => {
+    try {
+      await signupAPI({ name, email, password });
+      await login(email, password);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   };
 
   const logout = async () => {

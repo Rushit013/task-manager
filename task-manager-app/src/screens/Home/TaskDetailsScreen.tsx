@@ -50,6 +50,12 @@ const TaskDetailsScreen = () => {
       setCompleted(get(taskData, "completed", false));
     } catch (error) {
       console.error("Error fetching task:", error);
+      const errorText = get(
+        error,
+        "response.data.error",
+        get(error, "message", "")
+      );
+      showToast(`Error fetching task: ${errorText}`);
     } finally {
       hideLoader();
     }
@@ -66,7 +72,12 @@ const TaskDetailsScreen = () => {
         fetchTask();
       })
       .catch((error) => {
-        showToast("Error updating task!");
+        const errorText = get(
+          error,
+          "response.data.error",
+          get(error, "message", "")
+        );
+        showToast(`Error updating task: ${errorText}`);
         console.error("Error updating task:", error);
       })
       .finally(() => {
@@ -82,7 +93,12 @@ const TaskDetailsScreen = () => {
         showToast("Task delete successfully!");
       })
       .catch((error) => {
-        showToast("Error deleting task!");
+        const errorText = get(
+          error,
+          "response.data.error",
+          get(error, "message", "")
+        );
+        showToast(`Error deleting task: ${errorText}`);
         console.error("Error deleting task:", error);
       })
       .finally(() => {
@@ -106,7 +122,12 @@ const TaskDetailsScreen = () => {
         showToast("Task updated successfully!");
       })
       .catch((error) => {
-        showToast("Error updating task!");
+        const errorText = get(
+          error,
+          "response.data.error",
+          get(error, "message", "")
+        );
+        showToast(`Error updating task: ${errorText}`);
         console.error("Update Task Error:", error);
       })
       .finally(() => {

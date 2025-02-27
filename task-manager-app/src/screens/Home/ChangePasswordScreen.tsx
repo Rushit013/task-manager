@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import SaferAreaContainer from "../../components/SaferAreaContainer";
+import { get } from "lodash";
 
 interface ChangePasswordFormData {
   oldPassword: string;
@@ -53,7 +54,12 @@ const ChangePasswordScreen = () => {
         navigation.goBack();
       })
       .catch((error) => {
-        showToast("Something went wrong.");
+        const errorText = get(
+          error,
+          "response.data.error",
+          get(error, "message", "")
+        );
+        showToast(`Change Password Error: ${errorText}`);
         console.error("Change Password Error:", error);
       })
       .finally(() => {
