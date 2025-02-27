@@ -33,7 +33,9 @@ const HomeScreen = () => {
 
   const fetchTasks = async () => {
     try {
-      showLoader();
+      if (isEmpty(tasks)) {
+        showLoader();
+      }
       const res = await fetchTasksAPI();
       setTasks(res);
     } catch (error) {
