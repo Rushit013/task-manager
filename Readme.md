@@ -7,6 +7,10 @@ This repository contains a **Full Stack Task Manager App** with authentication a
 
 ---
 
+⚠️ **ALERT:** Since the backend is deployed on **Render's free plan**, it may occasionally return a **"Network Error"** due to server inactivity. If you do not receive a response, please try hitting the API again.
+
+---
+
 ## **Table of Contents**
 
 - [Features](#features)
