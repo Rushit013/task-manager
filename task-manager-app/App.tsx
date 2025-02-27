@@ -8,6 +8,7 @@ import ToastProvider from "./src/context/ToastContext";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./src/reduxStore/store";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
   const theme = {
@@ -27,6 +28,11 @@ export default function App() {
           <PaperProvider theme={theme}>
             <LoaderProvider>
               <ToastProvider>
+                <StatusBar
+                  style="dark"
+                  translucent
+                  backgroundColor="transparent"
+                />
                 <RootNavigator />
               </ToastProvider>
             </LoaderProvider>
